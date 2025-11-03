@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Электронная библиотека</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #2b2b2b;
+    color: #c5c5c5;
+    font-size: 1rem;
+  }
+
+  .navbar {
+    background-color: #242323;
+    color: #c5c5c5;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-left a, .nav-left span {
+    color: #c5c5c5;
+    margin-right: 12px;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .nav-left a:hover {
+    color: #ffffff;
+  }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .container {
+    max-width: 1000px;
+    margin: 24px auto;
+    padding: 0 16px;
+  }
+
+  .card {
+    background-color: #383838;
+    color: #d0d0d0;
+    padding: 18px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  }
+
+  footer {
+    margin-top: 18px;
+    padding: 12px 16px;
+    text-align: center;
+    color: #c5c5c5;
+    background-color: #242323;
+    font-size: 0.9rem;
+  }
+
+  .btn {
+    background-color: #4a4a4a;
+    color: #e0e0e0;
+    padding: 8px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    border: 1px solid #666;
+    cursor: pointer;
+  }
+
+  .btn:hover {
+    background-color: #5a5a5a;
+    color: #ffffff;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid #666;
+    color: #c5c5c5;
+    padding: 6px 10px;
+    border-radius: 6px;
+    text-decoration: none;
+  }
+
+  .btn-ghost:hover {
+    background-color: #3a3a3a;
+  }
+
+  .btn-small {
+    padding: 6px 8px;
+    font-size: 0.9rem;
+    border-radius: 6px;
+  }
+
+  .flash {
+    padding: 10px;
+    margin-bottom: 12px;
+    border-radius: 6px;
+  }
+
+  .flash.error {
+    background: #4b1f1f;
+    color: #ff9e9e;
+    border: 1px solid #a04d4d;
+  }
+
+  .flash.success {
+    background: #1f3b2a;
+    color: #98e6b4;
+    border: 1px solid #4f8d68;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #c5c5c5;
+  }
+
+  th, td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #444;
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  .actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .cover-thumb {
+    width: 72px;
+    height: auto;
+    border-radius: 6px;
+    object-fit: cover;
+  }
+
+  .pagination {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .muted {
+    color: #888;
+    font-size: 0.9rem;
+  }
+
+  /* Поля ввода и формы */
+  form textarea, form input, select {
+    background-color: #3a3a3a;
+    color: #d0d0d0;
+    border: 1px solid #555;
+    border-radius: 6px;
+    padding: 6px 8px;
+    width: 100%;
+  }
+
+  form textarea:focus, form input:focus {
+    border-color: #777;
+    outline: none;
+  }
+
+  form button {
+    background-color: #4a4a4a;
+    color: #e0e0e0;
+    border: 1px solid #666;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+  }
+
+  form button:hover {
+    background-color: #5a5a5a;
+  }
+
+  /* Модальное окно */
+  .modal-backdrop {
+    display: none;
+    position: fixed;
+    left: 0; top: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  .modal {
+    background-color: #383838;
+    color: #d0d0d0;
+    padding: 18px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 420px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  }
+
+  .modal h3 {
+    margin-top: 0;
+    color: #e0e0e0;
+  }
+
+  .modal .buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  a {
+    color: #e0e0e0;
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: #ffffff;
+  }
+</style>
+
+</head>
+<body>
+  <div class="navbar">
+    <div class="nav-left">
+      <a href="{{ url_for('books.index') }}" style="font-size:1.05rem">Электронная библиотека</a>
+      <a href="{{ url_for('books.index') }}">Книги</a>
+      {% if session.get('user_id') and g.user_role == 'пользователь' %}
+        <a href="{{ url_for('books.my_reviews') }}">Мои рецензии</a>
+      {% endif %}
+
+      {% if session.get('user_id') and g.user_role == 'модератор' %}
+        <a href="{{ url_for('books.moderation_list') }}">Модерация рецензий</a>
+      {% endif %}
+
+    </div>
+    <div class="nav-right">
+      {% if session.get('user_id') %}
+        <span>{{ session.get('full_name') }}</span>
+        <a class="btn-ghost" href="{{ url_for('auth.logout') }}">Выйти</a>
+      {% else %}
+        <a class="btn" href="{{ url_for('auth.login') }}">Войти</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, msg in messages %}
+          <div class="flash {{ 'error' if category=='error' else ('success' if category=='success' else '') }}">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </div>
+
+  <footer>
+    Группа: <strong>231-352</strong> — ФИО: <strong>Гуров Арсений Эрнестович</strong><br/>
+  </footer>
+
+  <!-- Модальное окно подтверждения удаления -->
+  <div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal" id="modalContent">
+      <h3 id="modalTitle">Удаление книги</h3>
+      <p id="modalMessage">Вы уверены, что хотите удалить книгу?</p>
+      <div class="buttons">
+        <button class="btn btn-small" id="modalNo">Нет</button>
+        <!-- форма для отправки POST на удаление (action устанавливается JS) -->
+        <form method="post" id="deleteForm" style="display:inline;">
+          <button type="submit" class="btn btn-small" style="background:#e74c3c;">Да</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Модальное окно подтверждения удаления: связываем с формой внутри модала
+  (function(){
+    var backdrop = document.getElementById('modalBackdrop');
+    var msg = document.getElementById('modalMessage');
+    var modalNo = document.getElementById('modalNo');
+    var deleteFormModal = document.getElementById('deleteForm'); // форма внутри модала
+    var currentFormToSubmit = null;
+
+    if (!backdrop || !msg || !modalNo || !deleteFormModal) {
+      // Если какой-то элемент отсутствует — ничего не делаем
+      console.warn('Modal elements not found; delete confirmation disabled.');
+      return;
+    }
+
+    // Функция открытия модала для конкретной формы (DOM element)
+    function openModalForForm(formElem) {
+      // Берём название книги из скрытого поля (или data-атрибута)
+      var titleInput = formElem.querySelector('input[name="book_title"]');
+      var title = titleInput ? titleInput.value : 'эту книгу';
+      msg.textContent = 'Вы уверены, что хотите удалить книгу «' + title + '»?';
+      // Устанавливаем action модальной формы на action исходной формы
+      deleteFormModal.action = formElem.action;
+      // Сохраняем ссылку, чтобы при подтверждении можно было отправить исходную форму (если нужно)
+      currentFormToSubmit = formElem;
+      // Показываем модал
+      backdrop.style.display = 'flex';
+    }
+
+    // Перехватываем submit всех .delete-form
+    var forms = document.querySelectorAll('.delete-form');
+    forms.forEach(function(f){
+      f.addEventListener('submit', function(e){
+        e.preventDefault(); // остановим обычную отправку
+        openModalForForm(f);
+      });
+    });
+
+    // Нажатие "Нет" — просто закрываем
+    modalNo.addEventListener('click', function(){
+      backdrop.style.display = 'none';
+      currentFormToSubmit = null;
+    });
+
+    // Если клик за пределами модального окна — закрыть
+    backdrop.addEventListener('click', function(e){
+      if (e.target === backdrop) {
+        backdrop.style.display = 'none';
+        currentFormToSubmit = null;
+      }
+    });
+
+    // Когда пользователь нажимает "Да" — отправляем модальную форму (которая имеет тот же action)
+    // deleteFormModal находится в DOM (в вашем base.html) и содержит submit кнопку.
+    deleteFormModal.addEventListener('submit', function(e){
+      // По умолчанию форма отправится на сервер — оставляем это поведение.
+      // Можно дополнительно синхронизировать с оригинальной формой, но это избыточно.
+      backdrop.style.display = 'none';
+    });
+  })();
+</script>
+
+
+</body>
+</html>
